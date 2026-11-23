@@ -49,6 +49,12 @@ export const BuildingInspector: React.FC<BuildingInspectorProps> = ({
           searchQuery: building.searchQuery,
         }),
       });
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error(
+          'Live Google Search requires the Express backend server (unavailable on static hosting).'
+        );
+      }
       const data = (await res.json()) as CampusSearchResult & { error?: string };
       if (!res.ok) {
         throw new Error(data.error || `Search failed (${res.status})`);

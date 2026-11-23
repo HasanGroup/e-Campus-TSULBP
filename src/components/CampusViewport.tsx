@@ -48,22 +48,47 @@ const _sunColor = new THREE.Color();
 const _hemiSky = new THREE.Color();
 const _hemiGround = new THREE.Color();
 
-const LIGHTING_PRESETS: Record<
-  LightingMode,
-  {
-    skyHex: number;
-    sunHex: number;
-    sunIntensity: number;
-    sunPos: [number, number, number];
-    hemiSkyHex: number;
-    hemiGroundHex: number;
-    hemiIntensity: number;
-    windowEmissive: number;
-    lampEmissive: number;
-    fogDensity: number;
-    exposure: number;
-  }
-> = {
+const _sunFromVec = new THREE.Vector3();
+const _sunToVec = new THREE.Vector3();
+const _rimColor = new THREE.Color();
+
+interface LightingStateSnapshot {
+  skyColor: THREE.Color;
+  sunColor: THREE.Color;
+  sunIntensity: number;
+  sunPos: THREE.Vector3;
+  hemiSky: THREE.Color;
+  hemiGround: THREE.Color;
+  hemiIntensity: number;
+  rimColor: THREE.Color;
+  rimIntensity: number;
+  envIntensity: number;
+  windowEmissive: number;
+  lampEmissive: number;
+  plazaGlow: number;
+  fogDensity: number;
+  exposure: number;
+}
+
+interface LightingPresetSpec {
+  skyHex: number;
+  sunHex: number;
+  sunIntensity: number;
+  sunPos: [number, number, number];
+  hemiSkyHex: number;
+  hemiGroundHex: number;
+  hemiIntensity: number;
+  rimHex: number;
+  rimIntensity: number;
+  envIntensity: number;
+  windowEmissive: number;
+  lampEmissive: number;
+  plazaGlow: number;
+  fogDensity: number;
+  exposure: number;
+}
+
+const LIGHTING_PRESETS: Record<LightingMode, LightingPresetSpec> = {
   day: {
     skyHex: 0xc8ddf2,
     sunHex: 0xfff5e4,
@@ -72,8 +97,12 @@ const LIGHTING_PRESETS: Record<
     hemiSkyHex: 0x93c5fd,
     hemiGroundHex: 0x7c6f5d,
     hemiIntensity: 0.95,
+    rimHex: 0x93c5fd,
+    rimIntensity: 0.38,
+    envIntensity: 1.0,
     windowEmissive: 0.0,
     lampEmissive: 0.08,
+    plazaGlow: 0,
     fogDensity: 0.00085,
     exposure: 1.08,
   },
@@ -81,12 +110,16 @@ const LIGHTING_PRESETS: Record<
     skyHex: 0xd98a6c,
     sunHex: 0xff9a52,
     sunIntensity: 2.1,
-    sunPos: [-190, 58, 115],
+    sunPos: [-190, 62, 115],
     hemiSkyHex: 0xfdba74,
     hemiGroundHex: 0x3f2e3e,
     hemiIntensity: 0.78,
+    rimHex: 0xfb923c,
+    rimIntensity: 0.48,
+    envIntensity: 0.68,
     windowEmissive: 0.65,
     lampEmissive: 1.6,
+    plazaGlow: 80,
     fogDensity: 0.00115,
     exposure: 1.05,
   },
@@ -98,12 +131,61 @@ const LIGHTING_PRESETS: Record<
     hemiSkyHex: 0x1e3a5f,
     hemiGroundHex: 0x0f172a,
     hemiIntensity: 0.55,
+    rimHex: 0x60a5fa,
+    rimIntensity: 0.28,
+    envIntensity: 0.24,
     windowEmissive: 1.45,
     lampEmissive: 2.8,
+    plazaGlow: 240,
     fogDensity: 0.00135,
     exposure: 1.02,
   },
 };
+
+function createSnapshotFromPreset(preset: LightingPresetSpec): LightingStateSnapshot {
+  return {
+    skyColor: new THREE.Color(preset.skyHex),
+    sunColor: new THREE.Color(preset.sunHex),
+    sunIntensity: preset.sunIntensity,
+    sunPos: new THREE.Vector3(...preset.sunPos),
+    hemiSky: new THREE.Color(preset.hemiSkyHex),
+    hemiGround: new THREE.Color(preset.hemiGroundHex),
+    hemiIntensity: preset.hemiIntensity,
+    rimColor: new THREE.Color(preset.rimHex),
+    rimIntensity: preset.rimIntensity,
+    envIntensity: preset.envIntensity,
+    windowEmissive: preset.windowEmissive,
+    lampEmissive: preset.lampEmissive,
+    plazaGlow: preset.plazaGlow,
+    fogDensity: preset.fogDensity,
+    exposure: preset.exposure,
+  };
+}
+
+function copySnapshot(
+  dst: LightingStateSnapshot,
+  src: LightingStateSnapshot
+): void {
+  dst.skyColor.copy(src.skyColor);
+  dst.sunColor.copy(src.sunColor);
+  dst.sunIntensity = src.sunIntensity;
+  dst.sunPos.copy(src.sunPos);
+  dst.hemiSky.copy(src.hemiSky);
+  dst.hemiGround.copy(src.hemiGround);
+  dst.hemiIntensity = src.hemiIntensity;
+  dst.rimColor.copy(src.rimColor);
+  dst.rimIntensity = src.rimIntensity;
+  dst.envIntensity = src.envIntensity;
+  dst.windowEmissive = src.windowEmissive;
+  dst.lampEmissive = src.lampEmissive;
+  dst.plazaGlow = src.plazaGlow;
+  dst.fogDensity = src.fogDensity;
+  dst.exposure = src.exposure;
+}
+
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
 
 function detectSoftwareWebGL(): boolean {
   try {
@@ -228,6 +310,7 @@ export const CampusViewport: React.FC<CampusViewportProps> = ({
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     const envMap = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = envMap;
+    scene.environmentIntensity = initialPreset.envIntensity;
     pmremGenerator.dispose();
 
     const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -259,7 +342,10 @@ export const CampusViewport: React.FC<CampusViewportProps> = ({
     sunLight.shadow.normalBias = 0.02;
     scene.add(sunLight);
 
-    const rimLight = new THREE.DirectionalLight(0x93c5fd, 0.38);
+    const rimLight = new THREE.DirectionalLight(
+      initialPreset.rimHex,
+      initialPreset.rimIntensity
+    );
     rimLight.position.set(-140, 80, -180);
     scene.add(rimLight);
 
@@ -462,8 +548,13 @@ export const CampusViewport: React.FC<CampusViewportProps> = ({
     let lastEmittedLat = 0;
     let lastEmittedLng = 0;
 
-    let currentWinEmissive = initialPreset.windowEmissive;
-    let currentLampEmissive = initialPreset.lampEmissive;
+    // Cross-fade lighting state (1.15s smooth ease-in-out cubic transition)
+    const CROSSFADE_DURATION = 1.15;
+    let activeLightingMode: LightingMode = lightingRef.current;
+    let crossfadeElapsed = CROSSFADE_DURATION;
+    const fromLighting = createSnapshotFromPreset(initialPreset);
+    const currentLighting = createSnapshotFromPreset(initialPreset);
+    const toLighting = createSnapshotFromPreset(initialPreset);
 
     function afterDraw(cb: () => void) {
       const gl = renderer.getContext() as WebGL2RenderingContext;
@@ -489,99 +580,131 @@ export const CampusViewport: React.FC<CampusViewportProps> = ({
       lastTime = now;
       const elapsed = now * 0.001;
 
-      // 1. Smoothly damp lighting/atmosphere transitions
-      const preset = LIGHTING_PRESETS[lightingRef.current];
-      const dampLambda = 4.5;
-      const alpha = 1 - Math.exp(-dampLambda * dt);
-
-      _skyColor.setHex(preset.skyHex);
-      if (scene.background instanceof THREE.Color) {
-        scene.background.lerp(_skyColor, alpha);
+      // 1. Detect lighting mode change and start smooth cross-fade from live state
+      if (lightingRef.current !== activeLightingMode) {
+        activeLightingMode = lightingRef.current;
+        copySnapshot(fromLighting, currentLighting);
+        const nextSpec = LIGHTING_PRESETS[activeLightingMode];
+        toLighting.skyColor.setHex(nextSpec.skyHex);
+        toLighting.sunColor.setHex(nextSpec.sunHex);
+        toLighting.sunIntensity = nextSpec.sunIntensity;
+        toLighting.sunPos.set(...nextSpec.sunPos);
+        toLighting.hemiSky.setHex(nextSpec.hemiSkyHex);
+        toLighting.hemiGround.setHex(nextSpec.hemiGroundHex);
+        toLighting.hemiIntensity = nextSpec.hemiIntensity;
+        toLighting.rimColor.setHex(nextSpec.rimHex);
+        toLighting.rimIntensity = nextSpec.rimIntensity;
+        toLighting.envIntensity = nextSpec.envIntensity;
+        toLighting.windowEmissive = nextSpec.windowEmissive;
+        toLighting.lampEmissive = nextSpec.lampEmissive;
+        toLighting.plazaGlow = nextSpec.plazaGlow;
+        toLighting.fogDensity = nextSpec.fogDensity;
+        toLighting.exposure = nextSpec.exposure;
+        crossfadeElapsed = 0;
       }
-      if (scene.fog instanceof THREE.FogExp2) {
-        _fogColor.setHex(preset.skyHex);
-        scene.fog.color.lerp(_fogColor, alpha);
-        scene.fog.density = THREE.MathUtils.damp(
-          scene.fog.density,
-          preset.fogDensity,
-          dampLambda,
-          dt
+
+      if (crossfadeElapsed < CROSSFADE_DURATION) {
+        crossfadeElapsed = Math.min(CROSSFADE_DURATION, crossfadeElapsed + dt);
+        const rawT = crossfadeElapsed / CROSSFADE_DURATION;
+        const t = easeInOutCubic(rawT);
+
+        // Interpolate colors and scalar channels smoothly
+        _skyColor.copy(fromLighting.skyColor).lerp(toLighting.skyColor, t);
+        _sunColor.copy(fromLighting.sunColor).lerp(toLighting.sunColor, t);
+        _hemiSky.copy(fromLighting.hemiSky).lerp(toLighting.hemiSky, t);
+        _hemiGround.copy(fromLighting.hemiGround).lerp(toLighting.hemiGround, t);
+        _rimColor.copy(fromLighting.rimColor).lerp(toLighting.rimColor, t);
+
+        currentLighting.skyColor.copy(_skyColor);
+        currentLighting.sunColor.copy(_sunColor);
+        currentLighting.hemiSky.copy(_hemiSky);
+        currentLighting.hemiGround.copy(_hemiGround);
+        currentLighting.rimColor.copy(_rimColor);
+
+        // Spherical-arc solar elevation boost mid-crossfade to avoid flat shadow sweeps
+        _sunFromVec.copy(fromLighting.sunPos);
+        _sunToVec.copy(toLighting.sunPos);
+        currentLighting.sunPos.lerpVectors(_sunFromVec, _sunToVec, t);
+        currentLighting.sunPos.y += Math.sin(rawT * Math.PI) * 34;
+
+        currentLighting.sunIntensity = THREE.MathUtils.lerp(
+          fromLighting.sunIntensity,
+          toLighting.sunIntensity,
+          t
         );
+        currentLighting.hemiIntensity = THREE.MathUtils.lerp(
+          fromLighting.hemiIntensity,
+          toLighting.hemiIntensity,
+          t
+        );
+        currentLighting.rimIntensity = THREE.MathUtils.lerp(
+          fromLighting.rimIntensity,
+          toLighting.rimIntensity,
+          t
+        );
+        currentLighting.envIntensity = THREE.MathUtils.lerp(
+          fromLighting.envIntensity,
+          toLighting.envIntensity,
+          t
+        );
+        currentLighting.windowEmissive = THREE.MathUtils.lerp(
+          fromLighting.windowEmissive,
+          toLighting.windowEmissive,
+          t
+        );
+        currentLighting.lampEmissive = THREE.MathUtils.lerp(
+          fromLighting.lampEmissive,
+          toLighting.lampEmissive,
+          t
+        );
+        currentLighting.plazaGlow = THREE.MathUtils.lerp(
+          fromLighting.plazaGlow,
+          toLighting.plazaGlow,
+          t
+        );
+        currentLighting.fogDensity = THREE.MathUtils.lerp(
+          fromLighting.fogDensity,
+          toLighting.fogDensity,
+          t
+        );
+        currentLighting.exposure = THREE.MathUtils.lerp(
+          fromLighting.exposure,
+          toLighting.exposure,
+          t
+        );
+
+        // Apply cross-faded values to scene, lights, renderer, and emissives
+        if (scene.background instanceof THREE.Color) {
+          scene.background.copy(currentLighting.skyColor);
+        }
+        if (scene.fog instanceof THREE.FogExp2) {
+          _fogColor.copy(currentLighting.skyColor);
+          scene.fog.color.copy(_fogColor);
+          scene.fog.density = currentLighting.fogDensity;
+        }
+        scene.environmentIntensity = currentLighting.envIntensity;
+        renderer.toneMappingExposure = currentLighting.exposure;
+
+        sunLight.color.copy(currentLighting.sunColor);
+        sunLight.intensity = currentLighting.sunIntensity;
+        sunLight.position.copy(currentLighting.sunPos);
+
+        hemiLight.color.copy(currentLighting.hemiSky);
+        hemiLight.groundColor.copy(currentLighting.hemiGround);
+        hemiLight.intensity = currentLighting.hemiIntensity;
+
+        rimLight.color.copy(currentLighting.rimColor);
+        rimLight.intensity = currentLighting.rimIntensity;
+
+        for (const mat of campusArtifacts.nightEmissiveMaterials) {
+          mat.emissiveIntensity = currentLighting.windowEmissive;
+        }
+        campusArtifacts.lampHeadMaterial.emissiveIntensity =
+          currentLighting.lampEmissive;
+
+        rectorateNightLight.intensity = currentLighting.plazaGlow;
+        b5NightLight.intensity = currentLighting.plazaGlow;
       }
-      _sunColor.setHex(preset.sunHex);
-      sunLight.color.lerp(_sunColor, alpha);
-      sunLight.intensity = THREE.MathUtils.damp(
-        sunLight.intensity,
-        preset.sunIntensity,
-        dampLambda,
-        dt
-      );
-      sunLight.position.x = THREE.MathUtils.damp(
-        sunLight.position.x,
-        preset.sunPos[0],
-        dampLambda,
-        dt
-      );
-      sunLight.position.y = THREE.MathUtils.damp(
-        sunLight.position.y,
-        preset.sunPos[1],
-        dampLambda,
-        dt
-      );
-      sunLight.position.z = THREE.MathUtils.damp(
-        sunLight.position.z,
-        preset.sunPos[2],
-        dampLambda,
-        dt
-      );
-
-      _hemiSky.setHex(preset.hemiSkyHex);
-      _hemiGround.setHex(preset.hemiGroundHex);
-      hemiLight.color.lerp(_hemiSky, alpha);
-      hemiLight.groundColor.lerp(_hemiGround, alpha);
-      hemiLight.intensity = THREE.MathUtils.damp(
-        hemiLight.intensity,
-        preset.hemiIntensity,
-        dampLambda,
-        dt
-      );
-
-      currentWinEmissive = THREE.MathUtils.damp(
-        currentWinEmissive,
-        preset.windowEmissive,
-        dampLambda,
-        dt
-      );
-      for (const mat of campusArtifacts.nightEmissiveMaterials) {
-        mat.emissiveIntensity = currentWinEmissive;
-      }
-
-      currentLampEmissive = THREE.MathUtils.damp(
-        currentLampEmissive,
-        preset.lampEmissive,
-        dampLambda,
-        dt
-      );
-      campusArtifacts.lampHeadMaterial.emissiveIntensity = currentLampEmissive;
-
-      const nightGlowTarget =
-        lightingRef.current === 'night'
-          ? 240
-          : lightingRef.current === 'sunset'
-            ? 80
-            : 0;
-      rectorateNightLight.intensity = THREE.MathUtils.damp(
-        rectorateNightLight.intensity,
-        nightGlowTarget,
-        dampLambda,
-        dt
-      );
-      b5NightLight.intensity = THREE.MathUtils.damp(
-        b5NightLight.intensity,
-        nightGlowTarget,
-        dampLambda,
-        dt
-      );
 
       // 2. Smooth Damped Camera Fly-To
       if (flyStateRef.current.active) {
