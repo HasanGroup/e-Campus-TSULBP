@@ -1,0 +1,6 @@
+{
+  "name": "TSULBP Khujand 3D Digital Twin",
+  "description": "Interactive 3D architectural digital twin of the Tajik State University of Law, Business, and Politics (ДДҲБСТ) in Khujand, Tajikistan with OSM terrain alignment, satellite imagery, Google Maps mini-map, and live Search grounding.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
