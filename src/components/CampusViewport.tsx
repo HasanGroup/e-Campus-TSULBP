@@ -333,11 +333,12 @@ export const CampusViewport: React.FC<CampusViewportProps> = ({
     sunLight.castShadow = !isSoftwareGl;
     sunLight.shadow.mapSize.set(2048, 2048);
     sunLight.shadow.camera.near = 20;
-    sunLight.shadow.camera.far = 520;
-    sunLight.shadow.camera.left = -165;
-    sunLight.shadow.camera.right = 165;
-    sunLight.shadow.camera.top = 165;
-    sunLight.shadow.camera.bottom = -165;
+    sunLight.shadow.camera.far = 560;
+    sunLight.shadow.camera.left = -185;
+    sunLight.shadow.camera.right = 185;
+    sunLight.shadow.camera.top = 185;
+    sunLight.shadow.camera.bottom = -185;
+    sunLight.shadow.radius = 2.5;
     sunLight.shadow.bias = -0.0005;
     sunLight.shadow.normalBias = 0.02;
     scene.add(sunLight);
@@ -349,7 +350,7 @@ export const CampusViewport: React.FC<CampusViewportProps> = ({
     rimLight.position.set(-140, 80, -180);
     scene.add(rimLight);
 
-    // Nighttime plaza accent point lights (intensity animated smoothly)
+    // Nighttime plaza & stele accent point lights (intensity animated smoothly)
     const rectorateNightLight = new THREE.PointLight(0xffb74d, 0, 95, 1.6);
     rectorateNightLight.position.set(-64, 18, 82);
     scene.add(rectorateNightLight);
@@ -357,6 +358,10 @@ export const CampusViewport: React.FC<CampusViewportProps> = ({
     const b5NightLight = new THREE.PointLight(0xffcf70, 0, 95, 1.6);
     b5NightLight.position.set(64, 18, -74);
     scene.add(b5NightLight);
+
+    const steleNightLight = new THREE.PointLight(0xffd27d, 0, 75, 1.6);
+    steleNightLight.position.set(134, 14, 76);
+    scene.add(steleNightLight);
 
     // Ground Terrain Base Plane (Architectural Base)
     const baseTerrainGeo = new THREE.PlaneGeometry(1400, 1400);
@@ -431,7 +436,11 @@ export const CampusViewport: React.FC<CampusViewportProps> = ({
         scene.remove(currentOsmContext.group);
         currentOsmContext.dispose();
       }
-      currentOsmContext = buildOsmContextGroup(dataset);
+      currentOsmContext = buildOsmContextGroup(
+        dataset,
+        textureRegistry,
+        maxAnisotropy
+      );
       currentOsmContext.group.visible = layersRef.current.osmContext;
       scene.add(currentOsmContext.group);
     };
@@ -704,6 +713,7 @@ export const CampusViewport: React.FC<CampusViewportProps> = ({
 
         rectorateNightLight.intensity = currentLighting.plazaGlow;
         b5NightLight.intensity = currentLighting.plazaGlow;
+        steleNightLight.intensity = currentLighting.plazaGlow * 0.75;
       }
 
       // 2. Smooth Damped Camera Fly-To

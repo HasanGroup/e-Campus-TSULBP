@@ -50,13 +50,13 @@ export const CAMPUS_BUILDINGS: CampusBuildingMeta[] = [
       'Раёсати донишгоҳ (Ректорат)',
       'Факултети ҳуқуқшиносӣ',
       'Факултети бизнес ва идоракунӣ',
-      'Китобхонаи илмӣ',
+      'Толори конфронси асосӣ',
     ],
     departmentsRu: [
       'Ректорат и администрация',
       'Юридический факультет',
       'Факультет бизнеса и управления',
-      'Научная библиотека (>350 тыс. книг)',
+      'Главный конференц-зал',
     ],
     descriptionEn:
       'Six-story ochre-yellow flagship administrative and academic block along Tashkent Avenue, crowned with the red Tajik university signboard, waving national flag, and blue upper-right facade banner.',
@@ -120,11 +120,11 @@ export const CAMPUS_BUILDINGS: CampusBuildingMeta[] = [
     ],
     descriptionEn:
       'Central north-south football pitch with regulation markings and multi-lane terracotta running track, bridging the southern avenue square and northern academic sectors.',
-    localPos: [-8, 12],
-    ...localToLatLon(-8, 12),
+    localPos: [-8, 4],
+    ...localToLatLon(-8, 4),
     cameraView: {
-      position: [-6, 72, 92],
-      target: [-8, 2, 12],
+      position: [-6, 72, 86],
+      target: [-8, 2, 4],
     },
     searchQuery:
       'TSULBP stadium Khujand Стадион ТГУ Худжанд sports facilities',
@@ -150,11 +150,11 @@ export const CAMPUS_BUILDINGS: CampusBuildingMeta[] = [
     ],
     descriptionEn:
       'Symmetrical landscaped square south of the stadium featuring four cypress-lined green quadrants, stone staircases, and a secondary archway connecting Tashkent Avenue to the stadium.',
-    localPos: [0, 68],
-    ...localToLatLon(0, 68),
+    localPos: [2, 72],
+    ...localToLatLon(2, 72),
     cameraView: {
-      position: [18, 34, 125],
-      target: [0, 3, 62],
+      position: [18, 34, 128],
+      target: [2, 3, 66],
     },
     searchQuery:
       'Tajik State University of Law, Business and Politics Khujand campus park Tashkent Avenue',
@@ -162,87 +162,93 @@ export const CAMPUS_BUILDINGS: CampusBuildingMeta[] = [
   },
   {
     id: 'east_rotunda_hall',
-    code: 'B3',
-    nameTj: 'Бинои шарқии варзишгоҳ',
-    nameRu: 'Восточный учебный корпус у стадиона',
-    nameEn: 'East Stadium Hall (Semicircular Bay)',
-    category: 'Academic Wing',
+    code: 'LIB',
+    nameTj: 'Китобхона',
+    nameRu: 'Библиотека',
+    nameEn: 'TSULBP Scientific Library',
+    category: 'Library & Reading Halls',
     stories: 2,
     departmentsTj: [
-      'Синфхонаҳои лексионӣ',
-      'Маркази забономӯзӣ ва методӣ',
+      'Китобхонаи илмӣ ва электронӣ',
+      'Толори хониши асосӣ (ротондаи ҷанубӣ)',
+      'Фонди китобҳои таълимӣ ва илмӣ',
     ],
     departmentsRu: [
-      'Лекционные аудитории',
-      'Лингвистический и методический центр',
+      'Научная и электронная библиотека',
+      'Главный читальный зал (южная ротонда)',
+      'Фонд учебной и научной литературы',
     ],
     descriptionEn:
-      'Elongated two-story academic hall east of the stadium featuring a pitched terracotta-red roof, signature semicircular southern bay, and dense cypress grove.',
-    localPos: [44, 14],
-    ...localToLatLon(44, 14),
+      'Elongated two-story ochre-yellow library east of the stadium featuring a pitched terracotta-red roof, signature semicircular southern reading rotunda, and landscaped cypress grove.',
+    localPos: [48, 10],
+    ...localToLatLon(48, 10),
     cameraView: {
-      position: [84, 34, 58],
-      target: [44, 5, 16],
+      position: [88, 34, 54],
+      target: [48, 5, 12],
     },
     searchQuery:
-      'TSULBP Khujand academic buildings faculties departments',
+      'TSULBP Khujand scientific library Китобхонаи ДДҲБСТ reading hall',
     accentColor: '#A93226',
   },
   {
     id: 'south_stadium_pavilion',
-    code: 'B4',
-    nameTj: 'Бинои ҷанубии варзишгоҳ',
-    nameRu: 'Южный корпус у стадиона',
-    nameEn: 'South Stadium Academic Building',
-    category: 'Academic & Services',
+    code: 'TP',
+    nameTj: 'Парки технологии ДДҲБСТ',
+    nameRu: 'Технопарк ДДҲБСТ',
+    nameEn: 'TSULBP Technopark',
+    category: 'Innovation & Technology',
     stories: 2,
     departmentsTj: [
-      'Шӯъбаи омодагӣ ва курсҳои кӯтоҳмуддат',
-      'Маркази фарҳангии донишҷӯён',
+      'Парки технологии донишгоҳ',
+      'Инкубатори тиҷоратӣ ва стартапҳо',
+      'Лабораторияҳои рақамӣ ва IT',
     ],
     departmentsRu: [
-      'Подготовительное отделение',
-      'Студенческий культурный центр',
+      'Технологический парк ДДҲБСТ',
+      'Бизнес-инкубатор и стартапы',
+      'Цифровые и IT-лаборатории',
     ],
     descriptionEn:
-      'Compact two-story yellow-stucco and red-roofed building positioned between the stadium embankment and the southeastern university garden.',
-    localPos: [26, 44],
-    ...localToLatLon(26, 44),
+      'Two-story ochre-stucco and red-roofed innovation hub positioned south of the Library between the stadium promenade and the southeastern university garden.',
+    localPos: [46, 48],
+    ...localToLatLon(46, 48),
     cameraView: {
-      position: [56, 26, 84],
-      target: [26, 5, 44],
+      position: [76, 26, 86],
+      target: [46, 5, 48],
     },
     searchQuery:
-      'Tajik State University of Law, Business and Politics student center Khujand',
+      'Tajik State University of Law, Business and Politics Technopark Технопарк ДДҲБСТ Парки технологии Khujand',
     accentColor: '#C0392B',
   },
   {
-    id: 'west_campus_annexes',
-    code: 'W1',
-    nameTj: 'Биноҳои таълимӣ ва хизматрасонии ғарбӣ',
-    nameRu: 'Западные учебно-бытовые корпуса',
-    nameEn: 'West Campus Red-Roof Annexes',
-    category: 'Academic & Support',
-    stories: 2,
+    id: 'sports_hall',
+    code: 'SH',
+    nameTj: 'Толори варзишӣ',
+    nameRu: 'Спортивный зал',
+    nameEn: 'TSULBP Sports Hall',
+    category: 'Athletics & Indoor Sports',
+    stories: 3,
     departmentsTj: [
-      'Лабораторияҳои таълимӣ',
-      'Ошхона ва маркази хизматрасонӣ',
+      'Толори варзишии пӯшида',
+      'Майдончаҳои волейбол, баскетбол ва гӯштин',
+      'Ротондаи даромадгоҳи шишагин',
     ],
     departmentsRu: [
-      'Учебные лаборатории',
-      'Студенческая столовая и хозблок',
+      'Крытый спортивный зал',
+      'Площадки для волейбола, баскетбола и борьбы',
+      'Стеклянная входная ротонда с колоннами',
     ],
     descriptionEn:
-      'Cluster of pitched red-roof buildings flanking the western edge of the stadium and north of the Main Rectorate courtyard.',
-    localPos: [-64, 24],
-    ...localToLatLon(-64, 24),
+      'Architectural twin of the New 5th Building situated west of the stadium, featuring an ochre-yellow facade, white vertical pilasters, red plinth and hipped roof, twin dormer bays, and a semicircular columned glass entrance rotunda.',
+    localPos: [-80, 32],
+    ...localToLatLon(-80, 32),
     cameraView: {
-      position: [-34, 34, 68],
-      target: [-64, 5, 26],
+      position: [-34, 34, 72],
+      target: [-76, 7, 32],
     },
     searchQuery:
-      'TSULBP Khujand campus facilities computer labs',
-    accentColor: '#9E2A22',
+      'TSULBP Khujand sports hall indoor gymnasium Толори варзишӣ ДДҲБСТ',
+    accentColor: '#E8C56C',
   },
   {
     id: 'northeast_main_hall',
@@ -304,34 +310,6 @@ export const CAMPUS_BUILDINGS: CampusBuildingMeta[] = [
       'TSULBP 5th building Khujand ТГУ 5 корпус новый Худжанд Faculty of Innovation and Telecommunications',
     accentColor: '#E8C56C',
   },
-  {
-    id: 'innovation_pavilion',
-    code: 'IP',
-    nameTj: 'Маркази инноватсия ва технологияҳо',
-    nameRu: 'Инновационный павильон',
-    nameEn: 'L-Shaped Innovation Glass Pavilion',
-    category: 'Research & Labs',
-    stories: 1,
-    departmentsTj: [
-      'Парки технологии донишгоҳ',
-      'Синфхонаҳои компютерӣ',
-    ],
-    departmentsRu: [
-      'Университетский технопарк',
-      'Компьютерные и мультимедийные классы',
-    ],
-    descriptionEn:
-      'Modern L-shaped terracotta pavilion featuring floor-to-ceiling cyan glass bays and twin manicured tree avenues in front.',
-    localPos: [-28, -42],
-    ...localToLatLon(-28, -42),
-    cameraView: {
-      position: [-10, 28, -6],
-      target: [-28, 4, -42],
-    },
-    searchQuery:
-      'Tajik State University of Law, Business and Politics technopark innovation center Khujand',
-    accentColor: '#8E5A3C',
-  },
 ];
 
 export const CAMERA_PRESETS: CameraPreset[] = [
@@ -339,8 +317,8 @@ export const CAMERA_PRESETS: CameraPreset[] = [
     id: 'overview',
     label: 'Overview (Satellite Alignment)',
     shortLabel: 'Overview',
-    position: [-25, 165, 198],
-    target: [6, 4, -6],
+    position: [-20, 165, 204],
+    target: [12, 4, -2],
   },
   {
     id: 'rectorate',
@@ -360,26 +338,26 @@ export const CAMERA_PRESETS: CameraPreset[] = [
     id: 'stadium',
     label: 'TSULBP Stadium',
     shortLabel: 'Stadium',
-    position: [-14, 72, 96],
-    target: [-6, 2, 12],
+    position: [-14, 72, 88],
+    target: [-6, 2, 4],
   },
   {
     id: 'topdown',
     label: 'Top-Down Plan',
     shortLabel: 'Plan',
-    position: [0, 295, 24],
-    target: [0, 0, -6],
+    position: [4, 295, 24],
+    target: [4, 0, -4],
   },
 ];
 
 /**
- * Fallback local OSM context (Tashkent Avenue, eastern roundabout, 17th Microdistrict
- * perimeter streets, and surrounding residential/institutional blocks) so the scene
- * renders accurately even offline or if Overpass API times out.
+ * Fallback local OSM context (Tashkent Avenue, SE roundabout directly adjacent to campus,
+ * 17th Microdistrict perimeter streets, and surrounding residential/institutional blocks)
+ * so the scene renders accurately even offline or if Overpass API times out.
  */
 export function getFallbackOsmDataset(): OsmDataset {
   const roads: OsmPolygon[] = [
-    // Tashkent Avenue (просп. Ташкентский) along the south edge + curve toward roundabout
+    // Tashkent Avenue (просп. Ташкентский) along the south edge directly into SE roundabout
     {
       id: 'fallback-tashkent-ave-main',
       kind: 'road',
@@ -389,27 +367,26 @@ export function getFallbackOsmDataset(): OsmDataset {
         [-260, 134],
         [-140, 118],
         [-30, 104],
-        [75, 92],
-        [124, 82],
-        [146, 66],
+        [75, 90],
+        [114, 82],
       ],
     },
-    // Tashkent Avenue Eastern Roundabout loop
+    // Tashkent Avenue Southeast Roundabout loop right next to SE corner of campus (center [134, 76])
     {
       id: 'fallback-tashkent-roundabout',
       kind: 'road',
       name: 'Круг Ташкентский',
       width: 12,
       points: [
-        [142, 82],
-        [156, 98],
-        [178, 102],
-        [196, 90],
-        [198, 68],
-        [184, 52],
-        [162, 50],
-        [144, 62],
-        [142, 82],
+        [114, 76],
+        [120, 90],
+        [134, 96],
+        [148, 90],
+        [154, 76],
+        [148, 62],
+        [134, 56],
+        [120, 62],
+        [114, 76],
       ],
     },
     // Eastern avenue north of roundabout
@@ -419,10 +396,22 @@ export function getFallbackOsmDataset(): OsmDataset {
       name: '17-мкр Восточная ул.',
       width: 11,
       points: [
-        [164, 52],
-        [154, -20],
-        [140, -110],
-        [128, -170],
+        [134, 54],
+        [130, -20],
+        [124, -110],
+        [120, -170],
+      ],
+    },
+    // Continuation of Tashkent Ave east of roundabout
+    {
+      id: 'fallback-tashkent-ave-east',
+      kind: 'road',
+      name: 'просп. Ташкентский (восток)',
+      width: 16,
+      points: [
+        [154, 76],
+        [210, 72],
+        [280, 68],
       ],
     },
     // Western neighborhood road
@@ -448,7 +437,7 @@ export function getFallbackOsmDataset(): OsmDataset {
         [-138, -115],
         [-30, -132],
         [70, -142],
-        [136, -134],
+        [128, -134],
       ],
     },
   ];
@@ -497,10 +486,10 @@ export function getFallbackOsmDataset(): OsmDataset {
       name: '17-мкр коммерческий центр',
       height: 18,
       points: [
-        [102, 22],
-        [138, 18],
-        [142, 62],
-        [106, 66],
+        [86, 4],
+        [114, 2],
+        [116, 40],
+        [88, 42],
       ],
     },
     {

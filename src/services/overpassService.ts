@@ -24,12 +24,14 @@ interface OverpassResponse {
  * campus cleanly without Z-fighting or double-rendering hero buildings.
  */
 function isInsideHeroCampus(x: number, z: number): boolean {
-  // SW Rectorate + Main Gate block
-  if (x >= -126 && x <= -35 && z >= 10 && z <= 104) return true;
-  // Central Stadium + Square + Flanking buildings
-  if (x >= -50 && x <= 78 && z >= -18 && z <= 96) return true;
-  // NE Sector + New 5th Building + Innovation Pavilion
-  if (x >= -58 && x <= 118 && z >= -116 && z <= -18) return true;
+  // SW Rectorate + Sports Hall + Main Gate block
+  if (x >= -128 && x <= -35 && z >= 8 && z <= 106) return true;
+  // Central Stadium + Square + Library + Technopark
+  if (x >= -50 && x <= 82 && z >= -20 && z <= 96) return true;
+  // NE Sector + New 5th Building + Unlabeled Pavilion
+  if (x >= -62 && x <= 118 && z >= -118 && z <= -18) return true;
+  // SE Roundabout & Stele zone on Tashkent Avenue
+  if (x >= 106 && x <= 162 && z >= 48 && z <= 104) return true;
   return false;
 }
 

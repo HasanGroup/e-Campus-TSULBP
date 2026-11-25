@@ -119,26 +119,43 @@ export function createFacadeTextures(
         ctx.fillRect(bx - 3, 0, 6, usableH);
       }
 
-      const wx = bx + bayW * 0.2;
-      const wy = floorTop + floorH * 0.23;
-      const ww = bayW * 0.6;
-      const wh = floorH * 0.6;
+      const wx = bx + bayW * 0.19;
+      const wy = floorTop + floorH * 0.22;
+      const ww = bayW * 0.62;
+      const wh = floorH * 0.62;
 
-      // Window frame
-      ctx.fillStyle = '#e2e8f0';
+      // Deep architectural recess shadow around window reveal
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.36)';
+      ctx.fillRect(wx - 4, wy - 4, ww + 6, wh + 6);
+
+      // White outer window casing & lower stone sill
+      ctx.fillStyle = '#f1f5f9';
       ctx.fillRect(wx - 2, wy - 2, ww + 4, wh + 4);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(wx - 4, wy + wh + 2, ww + 8, Math.max(3, floorH * 0.06));
 
-      // Glazing with sky reflection gradient
-      const grad = ctx.createLinearGradient(wx, wy, wx, wy + wh);
+      // Dark-blue reflective glazing with sky reflection gradient
+      const grad = ctx.createLinearGradient(wx, wy, wx + ww * 0.35, wy + wh);
       grad.addColorStop(0, windowColor);
-      grad.addColorStop(1, '#1e3a5f');
+      grad.addColorStop(0.55, '#1b3b66');
+      grad.addColorStop(1, '#0f2544');
       ctx.fillStyle = grad;
       ctx.fillRect(wx, wy, ww, wh);
 
+      // Diagonal glass sky-glint sheen
+      ctx.fillStyle = 'rgba(186, 230, 253, 0.18)';
+      ctx.beginPath();
+      ctx.moveTo(wx + 2, wy + 2);
+      ctx.lineTo(wx + ww * 0.52, wy + 2);
+      ctx.lineTo(wx + ww * 0.2, wy + wh - 2);
+      ctx.lineTo(wx + 2, wy + wh - 2);
+      ctx.closePath();
+      ctx.fill();
+
       // Mullion crossbars
-      ctx.fillStyle = 'rgba(248, 250, 252, 0.72)';
+      ctx.fillStyle = 'rgba(248, 250, 252, 0.84)';
       ctx.fillRect(wx + ww * 0.5 - 1, wy, 2, wh);
-      ctx.fillRect(wx, wy + wh * 0.42, ww, 1.5);
+      ctx.fillRect(wx, wy + wh * 0.4, ww, 1.8);
 
       // Nighttime interior room illumination (~68% occupancy)
       const litRoll = rand();
@@ -526,6 +543,123 @@ export function createArchitecturalBaseTexture(
     isColor: true,
     repeatX: 6,
     repeatY: 6,
+  });
+}
+
+export function createRoofTileTexture(
+  registry: TextureRegistry,
+  maxAnisotropy: number
+): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d')!;
+
+  ctx.fillStyle = '#9e2a22';
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Standing-seam metal / terracotta tile courses
+  const cols = 16;
+  const rows = 16;
+  const cw = 512 / cols;
+  const rh = 512 / rows;
+
+  for (let r = 0; r < rows; r++) {
+    ctx.fillStyle = r % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, r * rh, 512, rh);
+    ctx.fillStyle = 'rgba(45, 10, 8, 0.25)';
+    ctx.fillRect(0, r * rh + rh - 2, 512, 2);
+  }
+  for (let c = 0; c < cols; c++) {
+    ctx.fillStyle = 'rgba(255, 220, 210, 0.1)';
+    ctx.fillRect(c * cw, 0, 2, 512);
+    ctx.fillStyle = 'rgba(45, 10, 8, 0.24)';
+    ctx.fillRect(c * cw + 2, 0, 2, 512);
+  }
+
+  return finalizeTexture(canvas, registry, maxAnisotropy, {
+    isColor: true,
+    repeatX: 3,
+    repeatY: 3,
+  });
+}
+
+export function createPavingTileTexture(
+  registry: TextureRegistry,
+  maxAnisotropy: number
+): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d')!;
+
+  ctx.fillStyle = '#dcd7ce';
+  ctx.fillRect(0, 0, 512, 512);
+
+  const step = 32;
+  for (let y = 0; y < 512; y += step) {
+    for (let x = 0; x < 512; x += step) {
+      const n = ((x * 13 + y * 29) % 7) - 3;
+      ctx.fillStyle = `rgb(${216 + n * 2}, ${211 + n * 2}, ${201 + n * 2})`;
+      ctx.fillRect(x + 1, y + 1, step - 2, step - 2);
+    }
+  }
+
+  return finalizeTexture(canvas, registry, maxAnisotropy, {
+    isColor: true,
+    repeatX: 12,
+    repeatY: 8,
+  });
+}
+
+export function createAsphaltTexture(
+  registry: TextureRegistry,
+  maxAnisotropy: number
+): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d')!;
+
+  ctx.fillStyle = '#334155';
+  ctx.fillRect(0, 0, 256, 256);
+
+  for (let i = 0; i < 3200; i++) {
+    ctx.fillStyle =
+      i % 2 === 0 ? 'rgba(255,255,255,0.045)' : 'rgba(15,23,42,0.08)';
+    ctx.fillRect((i * 89) % 256, (i * 149) % 256, 2, 2);
+  }
+
+  return finalizeTexture(canvas, registry, maxAnisotropy, {
+    isColor: true,
+    repeatX: 4,
+    repeatY: 4,
+  });
+}
+
+export function createStuccoWallTexture(
+  registry: TextureRegistry,
+  maxAnisotropy: number,
+  baseHex = '#e4bd6b'
+): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d')!;
+
+  ctx.fillStyle = baseHex;
+  ctx.fillRect(0, 0, 256, 256);
+
+  for (let i = 0; i < 2400; i++) {
+    ctx.fillStyle =
+      i % 2 === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(30,41,59,0.04)';
+    ctx.fillRect((i * 71) % 256, (i * 113) % 256, 2, 2);
+  }
+
+  return finalizeTexture(canvas, registry, maxAnisotropy, {
+    isColor: true,
+    repeatX: 2,
+    repeatY: 2,
   });
 }
 
